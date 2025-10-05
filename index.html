@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- ================== CSS COMBINADO ================== -->
     <style>
         /* --- Variables y Estilos Globales --- */
         :root {
@@ -24,11 +23,7 @@
             --gradient-primary-hover: linear-gradient(45deg, #78169e, #692bfa);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -36,71 +31,67 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%232c2c2c' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.99-7.5L26 15v18.5l-13 7.5L0 33.5V15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             color: var(--color-text);
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- ✨ ESTILOS PARA LAS COLUMNAS DE ANIMACIÓN (GRUESO Y VIBRANTE) ✨ --- */
-        .dna-column {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            width: 250px; /* ¡Más Ancho! */
-            z-index: -1;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 24px; /* ¡Más Grande! */
-            color: rgba(191, 148, 228, 0.5); /* ¡Morado más claro y visible! */
-            overflow: hidden;
-            white-space: pre;
-            text-align: center; /* Centra la animación dentro de la columna */
-        }
+        /* --- Estilos Animación de Fondo --- */
+        .dna-column { position: fixed; top: 0; bottom: 0; width: 250px; z-index: -1; font-family: 'Courier New', Courier, monospace; font-size: 24px; color: rgba(191, 148, 228, 0.5); overflow: hidden; white-space: pre; text-align: center; }
+        #dna-animation-left { left: 0; }
+        #dna-animation-right { right: 0; }
+        @media (max-width: 1400px) { .dna-column { display: none; } }
 
-        #dna-animation-left {
-            left: 0;
-        }
-
-        #dna-animation-right {
-            right: 0;
-        }
-
-        /* ✨ SOLUCIÓN: Se baja el punto de quiebre para que se vea en más pantallas de PC ✨ */
-        @media (max-width: 1400px) { 
-            .dna-column {
-                display: none;
-            }
-        }
-        /* --- FIN DE ESTILOS DE ANIMACIÓN --- */
-
-        /* --- Layout Principal (Header, Main, Footer) --- */
-        .main-header, main, .main-footer {
-            width: 90%;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem 0;
-            position: relative;
-            z-index: 1;
-        }
-        
+        /* --- Layout Principal --- */
+        .main-header, main, .main-footer { width: 90%; max-width: 900px; margin: 0 auto; padding: 2rem 0; position: relative; z-index: 1; }
         .main-header { text-align: center; border-bottom: 1px solid var(--color-surface); margin-bottom: 2rem; }
         .main-header h1 { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 2.8rem; margin-bottom: 0.5rem; }
         .main-header p { color: var(--color-text-secondary); font-size: 1.1rem; }
         .main-footer { text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--color-surface); color: var(--color-text-secondary); font-size: 0.9rem; }
-        .controls-container { background: rgba(44, 44, 44, 0.6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--shadow); display: grid; gap: 1.5rem; grid-template-columns: 1.5fr 1fr; grid-template-areas: "title title" "mode color" "count button"; }
-        .controls-container h2 { grid-column: 1 / -1; margin-bottom: 0.5rem; border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
+        
+        /* --- Contenedor de Controles --- */
+        .controls-container {
+            background: rgba(44, 44, 44, 0.6);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: 1.5fr 1fr;
+            grid-template-areas:
+                "title  title"
+                "mode   color"
+                "count  button";
+        }
         .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
         label { font-size: 0.9rem; font-weight: 700; color: var(--color-text-secondary); }
+
+        /* --- CORRECCIÓN: Asignación de áreas del grid --- */
+        .controls-container h2 { grid-area: title; margin-bottom: 0.5rem; border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
+        #palette-mode-group { grid-area: mode; }
+        #color-group { grid-area: color; }
+        #count-group { grid-area: count; }
+        #generate-btn { grid-area: button; align-self: end; }
+
+        /* --- Estilos de Inputs --- */
         select, input[type="color"], button { padding: 0.75rem; border-radius: var(--border-radius); border: 2px solid #444; background-color: #3b3b3b; color: var(--color-text); font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.2s ease-in-out; }
         #palette-purpose { width: 100%; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         select:focus, input[type="range"]:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.4); }
         input[type="color"] { padding: 0.25rem; height: 50px; }
         .select-wrapper, .range-wrapper { display: flex; align-items: center; gap: 0.5rem; }
+        
+        /* --- Info Box --- */
         #harmony-info-icon { cursor: pointer; font-size: 1.2rem; opacity: 0.7; transition: opacity 0.2s ease; }
         #harmony-info-icon:hover { opacity: 1; }
         .control-group:has(#palette-purpose) { position: relative; }
         #harmony-info-box { position: absolute; top: 100%; left: 0; z-index: 10; width: auto; min-width: 280px; margin-top: 0.5rem; background-color: #3b3b3b; padding: 1rem; border-radius: var(--border-radius); border: 1px solid #444; font-size: 0.9rem; color: var(--color-text-secondary); opacity: 0; transform: translateY(-10px); pointer-events: none; transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
         #harmony-info-box.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        #generate-btn { grid-column: -1; background: var(--gradient-primary); border: none; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; }
+        
+        /* --- Botón --- */
+        #generate-btn { background: var(--gradient-primary); border: none; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; }
         #generate-btn:hover { background: var(--gradient-primary-hover); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); }
+        
+        /* --- Paleta y Previsualización --- */
         .palette-container { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; min-height: 150px; }
         .palette-placeholder { width: 100%; display: flex; justify-content: center; align-items: center; border: 2px dashed; border-image-slice: 1; border-image-source: linear-gradient(to right, var(--color-primary), #3498db, var(--color-primary)); border-radius: var(--border-radius); padding: 2rem; color: var(--color-text-secondary); animation: moveBorder 3s linear infinite; }
         @keyframes moveBorder { 0% { border-image-source: linear-gradient(to right, var(--color-primary), #3498db, var(--color-primary)); } 50% { border-image-source: linear-gradient(to right, #3498db, var(--color-primary), #3498db); } 100% { border-image-source: linear-gradient(to right, var(--color-primary), #3498db, var(--color-primary)); } }
@@ -116,6 +107,46 @@
         .color-swatch:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
         .color-code { width: 100%; padding: 0.75rem; background-color: rgba(0, 0, 0, 0.45); color: white; text-align: center; font-weight: 700; }
 
+        /* ================================================================== */
+        /* --- AÑADIDO: ESTILOS PARA MÓVILES Y PANTALLAS PEQUEÑAS --- */
+        /* ================================================================== */
+        @media (max-width: 768px) {
+            /* 1. Ajustamos el layout principal y la tipografía */
+            .main-header h1 {
+                font-size: 2rem; /* Hacemos el título principal un poco más pequeño */
+            }
+
+            main, .main-header, .main-footer {
+                width: 95%; /* Usamos un poco más de espacio en los lados */
+            }
+
+            /* 2. Reorganizamos el panel de controles a UNA SOLA COLUMNA */
+            .controls-container {
+                /* Cambiamos el "mapa" del grid para que sea vertical */
+                grid-template-columns: 1fr; /* Ahora solo hay una columna */
+                grid-template-areas:
+                    "title"
+                    "mode"
+                    "color"
+                    "count"
+                    "button";
+                padding: 1.5rem; /* Reducimos un poco el padding */
+            }
+
+            #generate-btn {
+                margin-top: 1rem;
+            }
+
+            /* 3. Hacemos que la previsualización se vea bien */
+            .preview-container {
+                width: 95%;
+                margin-top: 2rem;
+            }
+
+            .preview-card {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -197,10 +228,8 @@
         <p>&copy; 2025 - Creado con Wiener Hound Studios.</p>
     </footer>
 
-    <!-- ================== JAVASCRIPT COMBINADO ================== -->
     <script>
     // --- SCRIPT.JS (LÓGICA DE LA PALETA) ---
-
     const palettePurposeSelect = document.getElementById('palette-purpose');
     const baseColorInput = document.getElementById('base-color');
     const colorCountSlider = document.getElementById('color-count');
@@ -211,9 +240,7 @@
     const harmonyInfoBox = document.getElementById('harmony-info-box');
     const harmonyInfoText = document.getElementById('harmony-info-text');
 
-    const harmonyDescriptions = {
-        'monochromatic': 'Usa un solo color con variaciones en brillo y saturación. Ideal para un look limpio, elegante y minimalista.', 'analogous': 'Combina colores que están uno al lado del otro en el círculo cromático. Crea una sensación de calma y armonía natural.', 'complementary': 'Usa colores opuestos en el círculo cromático para un máximo contraste. Perfecto para llamadas a la acción y diseños vibrantes.', 'split-complementary': 'Ofrece un alto contraste como la complementaria, pero con menos tensión visual. Una opción muy versátil y agradable.', 'triadic': 'Usa tres colores equidistantes, creando una paleta equilibrada pero dinámica. Ideal para diseños coloridos y enérgicos.', 'tetradic': 'Utiliza cuatro colores en dos pares complementarios. Ofrece la mayor variedad y es excelente para diseños que necesitan destacar.', 'earth-tones': 'Genera colores inspirados en la naturaleza como marrones, beiges y verdes apagados. Evoca una sensación orgánica y estable.', 'pastel-tones': 'Crea colores suaves y pálidos. Perfecta para diseños que buscan transmitir delicadeza, calma y un toque juvenil.', 'jewel-tones': 'Produce colores ricos y saturados inspirados en gemas preciosas. Ideal para un look lujoso, dramático y sofisticado.', 'neon-tones': 'Genera colores extremadamente brillantes y vívidos. Usada para un estilo moderno, futurista y lleno de energía.', 'neutral-tones': 'Crea una paleta con blanco, negro y grises. Perfecta para diseños minimalistas y profesionales donde el contenido es el rey.', 'sunset-tones': 'Combina naranjas, rosas y morados cálidos para imitar un atardecer. Evoca sensaciones de calidez, drama y belleza.'
-    };
+    const harmonyDescriptions = { 'monochromatic': 'Usa un solo color con variaciones en brillo y saturación. Ideal para un look limpio, elegante y minimalista.', 'analogous': 'Combina colores que están uno al lado del otro en el círculo cromático. Crea una sensación de calma y armonía natural.', 'complementary': 'Usa colores opuestos en el círculo cromático para un máximo contraste. Perfecto para llamadas a la acción y diseños vibrantes.', 'split-complementary': 'Ofrece un alto contraste como la complementaria, pero con menos tensión visual. Una opción muy versátil y agradable.', 'triadic': 'Usa tres colores equidistantes, creando una paleta equilibrada pero dinámica. Ideal para diseños coloridos y enérgicos.', 'tetradic': 'Utiliza cuatro colores en dos pares complementarios. Ofrece la mayor variedad y es excelente para diseños que necesitan destacar.', 'earth-tones': 'Genera colores inspirados en la naturaleza como marrones, beiges y verdes apagados. Evoca una sensación orgánica y estable.', 'pastel-tones': 'Crea colores suaves y pálidos. Perfecta para diseños que buscan transmitir delicadeza, calma y un toque juvenil.', 'jewel-tones': 'Produce colores ricos y saturados inspirados en gemas preciosas. Ideal para un look lujoso, dramático y sofisticado.', 'neon-tones': 'Genera colores extremadamente brillantes y vívidos. Usada para un estilo moderno, futurista y lleno de energía.', 'neutral-tones': 'Crea una paleta con blanco, negro y grises. Perfecta para diseños minimalistas y profesionales donde el contenido es el rey.', 'sunset-tones': 'Combina naranjas, rosas y morados cálidos para imitar un atardecer. Evoca sensaciones de calidez, drama y belleza.' };
 
     colorCountSlider.addEventListener('input', () => { colorCountValue.textContent = colorCountSlider.value; });
     generateBtn.addEventListener('click', generatePalette);
@@ -262,9 +289,44 @@
     function getTriadic(baseHsl, count) { const colors = [{...baseHsl}]; colors.push({h: (baseHsl.h + 120) % 360, s: baseHsl.s, l: baseHsl.l}); colors.push({h: (baseHsl.h + 240) % 360, s: baseHsl.s, l: baseHsl.l}); for (let i = 3; i < count; i++) { colors.push({h: colors[i % 3].h, s: baseHsl.s, l: clamp((baseHsl.l + i * 4), 6, 94)}); } return colors.slice(0, count); }
     function getTetradic(baseHsl, count) { const colors = [{...baseHsl}]; colors.push({h: (baseHsl.h + 90) % 360, s: baseHsl.s, l: baseHsl.l}); colors.push({h: (baseHsl.h + 180) % 360, s: baseHsl.s, l: baseHsl.l}); colors.push({h: (baseHsl.h + 270) % 360, s: baseHsl.s, l: baseHsl.l}); return colors.slice(0, Math.min(count, 4)); }
     function getThematicPalette(count, [hRange, sRange, lRange]) { const colors = []; for (let i = 0; i < count; i++) { const h = randomHueInRange(hRange[0], hRange[1]); const s = Math.random() * (sRange[1] - sRange[0]) + sRange[0]; const l = Math.random() * (lRange[1] - lRange[0]) + lRange[0]; colors.push({ h, s, l }); } return colors; }
-    function renderPalette(colors) { paletteDisplay.innerHTML = ''; if (colors.length === 0) { paletteDisplay.innerHTML = `<div class="palette-placeholder"><p>¡Tu paleta de colores aparecerá aquí!</p></div>`; } else { colors.forEach(colorHex => { const colorSwatch = document.createElement('div'); colorSwatch.className = 'color-swatch'; colorSwatch.style.backgroundColor = colorHex; const colorCode = document.createElement('span'); colorCode.className = 'color-code'; colorCode.textContent = colorHex.toUpperCase(); colorSwatch.appendChild(colorCode); colorSwatch.addEventListener('click', () => { navigator.clipboard.writeText(colorHex).then(() => { const previous = colorCode.textContent; colorCode.textContent = '¡Copiado!'; setTimeout(() => { colorCode.textContent = previous; }, 1000); }).catch(err => { console.error('Error al copiar:', err); }); }); paletteDisplay.appendChild(colorSwatch); }); } const preview = document.getElementById('preview-section'); if (preview) { const safe = (i) => colors[i] || colors[colors.length - 1] || '#ffffff'; preview.style.setProperty('--p-card-bg', safe(4)); preview.style.setProperty('--p-text', safe(0)); preview.style.setProperty('--p-headline', safe(1)); preview.style.setProperty('--p-primary', safe(2)); preview.style.setProperty('--p-accent', safe(3)); preview.style.setProperty('--p-border', safe(3)); } }
+    
+    function renderPalette(colors) { 
+        paletteDisplay.innerHTML = ''; 
+        if (colors.length === 0) { 
+            paletteDisplay.innerHTML = `<div class="palette-placeholder"><p>¡Tu paleta de colores aparecerá aquí!</p></div>`; 
+        } else { 
+            colors.forEach(colorHex => { 
+                const colorSwatch = document.createElement('div'); 
+                colorSwatch.className = 'color-swatch'; 
+                colorSwatch.style.backgroundColor = colorHex; 
+                const colorCode = document.createElement('span'); 
+                colorCode.className = 'color-code'; 
+                colorCode.textContent = colorHex.toUpperCase(); 
+                colorSwatch.appendChild(colorCode); 
+                colorSwatch.addEventListener('click', () => { 
+                    navigator.clipboard.writeText(colorHex).then(() => { 
+                        const previous = colorCode.textContent; 
+                        colorCode.textContent = '¡Copiado!'; 
+                        setTimeout(() => { colorCode.textContent = previous; }, 1000); 
+                    }).catch(err => { console.error('Error al copiar:', err); }); 
+                }); 
+                paletteDisplay.appendChild(colorSwatch); 
+            }); 
+        } 
+        const preview = document.getElementById('preview-section'); 
+        if (preview) { 
+            const safe = (i) => colors[i] || colors[colors.length - 1] || '#ffffff'; 
+            preview.style.setProperty('--p-card-bg', safe(4)); 
+            preview.style.setProperty('--p-text', safe(0)); 
+            preview.style.setProperty('--p-headline', safe(1)); 
+            preview.style.setProperty('--p-primary', safe(2)); 
+            preview.style.setProperty('--p-accent', safe(3)); 
+            preview.style.setProperty('--p-border', safe(3)); 
+        } 
+    }
+    
     function hexToHsl(hex) { if (!hex || typeof hex !== 'string') return { h: 0, s: 0, l: 50 }; hex = hex.replace('#', ''); let r, g, b; if (hex.length === 3) { r = parseInt(hex[0] + hex[0], 16); g = parseInt(hex[1] + hex[1], 16); b = parseInt(hex[2] + hex[2], 16); } else { r = parseInt(hex.substring(0, 2), 16); g = parseInt(hex.substring(2, 4), 16); b = parseInt(hex.substring(4, 6), 16); } r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); let h = 0, s = 0, l = (max + min) / 2; if (max !== min) { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s * 100, l: l * 100 }; }
-    function hslToHex({ h = 0, s = 0, l = 0 }) { s /= 100; l /= 100; const c = (1 - Math.abs(2 * l - 1)) * s; const x = c * (1 - Math.abs((h / 60) % 2 - 1)); const m = l - c / 2; let r = 0, g = 0, b = 0; if (h >= 0 && h < 60) { [r, g, b] = [c, x, 0]; } else if (h >= 60 && h < 120) { [r, g, b] = [x, c, 0]; } else if (h >= 120 && h < 180) { [r, g, b] = [0, c, x]; } else if (h >= 180 && h < 240) { [r, g, b] = [0, x, c]; } else if (h >= 240 && h < 300) { [r, g, b] = [x, 0, c]; } else { [r, g, b] = [c, 0, x]; } const toHex = val => Math.round(val * 255).toString(16).padStart(2, '0'); return `#${toHex(r+m)}${toHex(g+m)}${toHex(b+m)}`; }
+    function hslToHex({ h = 0, s = 0, l = 0 }) { s /= 100; l /= 100; const c = (1 - Math.abs(2 * l - 1)) * s; const x = c * (1 - Math.abs((h / 60) % 2 - 1)); const m = l - c / 2; let r = 0, g = 0, b = 0; if (h >= 0 && h < 60) { [r, g, b] = [c, x, 0]; } else if (h >= 60 && h < 120) { [r, g, b] = [x, c, 0]; } else if (h >= 120 && h < 180) { [r, g, b] = [0, c, x]; } else if (h >= 180 && h < 240) { [r, g, b] = [0, x, c]; } else if (h >= 240 && h < 300) { [r, g, b] = [x, 0, c]; } else { [r, g, b] = [c, 0, x]; } const toHex = val => Math.round((val * 255)).toString(16).padStart(2, '0'); return `#${toHex(r+m)}${toHex(g+m)}${toHex(b+m)}`; }
     function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
     function randomHueInRange(a, b) { a = ((a % 360) + 360) % 360; b = ((b % 360) + 360) % 360; if (a === b) return a; if (a < b) { return Math.random() * (b - a) + a; } else { const total = (360 - a) + b; const r = Math.random() * total; return (r < (360 - a)) ? (a + r) : (r - (360 - a)); } }
 
