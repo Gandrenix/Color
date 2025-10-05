@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Paletas de Colores</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- ================== CSS COMBINADO ================== -->
+    <style>
+        /* --- Variables y Estilos Globales --- */
+        :root {
+            --color-background: #1a1a1a;
+            --color-surface: #2c2c2c;
+            --color-primary: #8e44ad;
+            --color-primary-light: #9b59b6;
+            --color-text: #ecf0f1;
+            --color-text-secondary: #bdc3c7;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            --border-radius: 8px;
+            --gradient-primary: linear-gradient(45deg, #6a19a4, #9b2bc0);
+            --gradient-primary-hover: linear-gradient(45deg, #78169e, #692bfa);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%232c2c2c' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.99-7.5L26 15v18.5l-13 7.5L0 33.5V15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--color-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- ✨ ESTILOS PARA LAS COLUMNAS DE ANIMACIÓN (GRUESO Y VIBRANTE) ✨ --- */
+        .dna-column {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 250px; /* ¡Más Ancho! */
+            z-index: -1;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 24px; /* ¡Más Grande! */
+            color: rgba(191, 148, 228, 0.5); /* ¡Morado más claro y visible! */
+            overflow: hidden;
+            white-space: pre;
+            text-align: center; /* Centra la animación dentro de la columna */
+        }
+
+        #dna-animation-left {
+            left: 0;
+        }
+
+        #dna-animation-right {
+            right: 0;
+        }
+
+        /* ✨ SOLUCIÓN: Se baja el punto de quiebre para que se vea en más pantallas de PC ✨ */
+        @media (max-width: 1400px) { 
+            .dna-column {
+                display: none;
+            }
+        }
+        /* --- FIN DE ESTILOS DE ANIMACIÓN --- */
+
+        /* --- Layout Principal (Header, Main, Footer) --- */
+        .main-header, main, .main-footer {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-header { text-align: center; border-bottom: 1px solid var(--color-surface); margin-bottom: 2rem; }
+        .main-header h1 { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 2.8rem; margin-bottom: 0.5rem; }
+        .main-header p { color: var(--color-text-secondary); font-size: 1.1rem; }
+        .main-footer { text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--color-surface); color: var(--color-text-secondary); font-size: 0.9rem; }
+        .controls-container { background: rgba(44, 44, 44, 0.6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--shadow); display: grid; gap: 1.5rem; grid-template-columns: 1.5fr 1fr; grid-template-areas: "title title" "mode color" "count button"; }
+        .controls-container h2 { grid-column: 1 / -1; margin-bottom: 0.5rem; border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        label { font-size: 0.9rem; font-weight: 700; color: var(--color-text-secondary); }
+        select, input[type="color"], button { padding: 0.75rem; border-radius: var(--border-radius); border: 2px solid #444; background-color: #3b3b3b; color: var(--color-text); font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.2s ease-in-out; }
+        #palette-purpose { width: 100%; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        select:focus, input[type="range"]:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.4); }
+        input[type="color"] { padding: 0.25rem; height: 50px; }
+        .select-wrapper, .range-wrapper { display: flex; align-items: center; gap: 0.5rem; }
+        #harmony-info-icon { cursor: pointer; font-size: 1.2rem; opacity: 0.7; transition: opacity 0.2s ease; }
+        #harmony-info-icon:hover { opacity: 1; }
+        .control-group:has(#palette-purpose) { position: relative; }
+        #harmony-info-box { position: absolute; top: 100%; left: 0; z-index: 10; width: auto; min-width: 280px; margin-top: 0.5rem; background-color: #3b3b3b; padding: 1rem; border-radius: var(--border-radius); border: 1px solid #444; font-size: 0.9rem; color: var(--color-text-secondary); opacity: 0; transform: translateY(-10px); pointer-events: none; transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
+        #harmony-info-box.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        #generate-btn { grid-column: -1; background: var(--gradient-primary); border: none; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; }
+        #generate-btn:hover { background: var(--gradient-primary-hover); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); }
+        .palette-container { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; min-height: 150px; }
+        .palette-placeholder { width: 100%; display: flex; justify-content: center; align-items: center; border: 2px dashed; border-image-slice: 1; border-image-source: linear-gradient(to right, var(--color-primary), #3498db, var(--color-primary)); border-radius: var(--border-radius); padding: 2rem; color: var(--color-text-secondary); animation: moveBorder 3s linear infinite; }
+        @keyframes moveBorder { 0% { border-image-source: linear-gradient(to right, var(--color-primary), #3498db, var(--color-primary)); } 50% { border-image-source: linear-gradient(to right, #3498db, var(--color-primary), #3498db); } 100% { border-image-source: linear-gradient(to right, var(--color-primary), #3498db, var(--color-primary)); } }
+        .preview-container { width: 90%; max-width: 900px; margin: 3rem auto 0; padding-top: 2rem; border-top: 1px solid var(--color-surface); }
+        .preview-container h2 { text-align: center; margin-bottom: 1.5rem; color: var(--color-text-secondary); }
+        .preview-card { background-color: var(--p-card-bg, #fff); color: var(--p-text, #333); border-radius: var(--border-radius); box-shadow: var(--shadow); overflow: hidden; max-width: 350px; margin: 0 auto; border: 1px solid var(--p-border, #ddd); transition: all 0.3s ease; }
+        .preview-image { width: 100%; height: 180px; background-color: var(--p-accent, #e0e0e0); }
+        .preview-content { padding: 1.5rem; }
+        .preview-title { color: var(--p-headline, #000); margin-top: 0; margin-bottom: 0.5rem; }
+        .preview-button { background-color: var(--p-primary, #007bff); color: var(--p-card-bg, #fff); border: none; padding: 0.75rem 1.5rem; border-radius: 5px; font-weight: 700; cursor: pointer; transition: background-color 0.2s ease; }
+        .preview-button:hover { filter: brightness(1.1); }
+        .color-swatch { flex: 1 1 120px; min-width: 120px; height: 200px; border-radius: var(--border-radius); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; box-shadow: var(--shadow); display: flex; align-items: flex-end; }
+        .color-swatch:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .color-code { width: 100%; padding: 0.75rem; background-color: rgba(0, 0, 0, 0.45); color: white; text-align: center; font-weight: 700; }
+
+    </style>
+</head>
+<body>
+
+    <pre id="dna-animation-left" class="dna-column"></pre>
+    <pre id="dna-animation-right" class="dna-column"></pre>
+
+    <header class="main-header">
+        <h1>Tu Asistente de Color</h1>
+        <p>Crea paletas de colores armoniosas sin necesidad de ser un experto.</p>
+    </header>
+
+    <main>
+        <section class="controls-container">
+            <h2>Configura tu Paleta</h2>
+            
+            <div class="control-group" id="palette-mode-group">
+                <label for="palette-purpose">1. Elige un modo...</label>
+                <div class="select-wrapper">
+                    <select name="palette-purpose" id="palette-purpose">
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <optgroup label="Armonías Geométricas">
+                            <option value="monochromatic">Simple y Elegante (Monocromática)</option>
+                            <option value="analogous">Armoniosa y Natural (Análoga)</option>
+                            <option value="complementary">Vibrante y con Contraste (Complementaria)</option>
+                            <option value="split-complementary">Contraste Sofisticado (Comp. Divididos)</option>
+                            <option value="triadic">Equilibrada y Versátil (Triádica)</option>
+                            <option value="tetradic">Máxima Energía y Variedad (Tetrádica)</option>
+                        </optgroup>
+                        <optgroup label="Estilos Temáticos">
+                            <option value="earth-tones">Cálida y Terrenal</option>
+                            <option value="pastel-tones">Suave y Delicada</option>
+                            <option value="jewel-tones">Lujosa y Profunda</option>
+                            <option value="neon-tones">Eléctrica y Moderna</option>
+                            <option value="neutral-tones">Neutral y Minimalista</option>
+                            <option value="sunset-tones">Cálida y Evocadora</option>
+                        </optgroup>
+                    </select>
+                    <span id="harmony-info-icon">ℹ️</span>
+                </div>
+                <div id="harmony-info-box" class="info-box">
+                    <p id="harmony-info-text">Selecciona un estilo para ver una descripción.</p>
+                </div>
+            </div>
+
+            <div class="control-group" id="color-group">
+                <label for="base-color">2. Elige un color para empezar</label>
+                <input type="color" id="base-color" name="base-color" value="#3498db">
+            </div>
+
+            <div class="control-group" id="count-group">
+                <label for="color-count">3. ¿Cuántos colores quieres?</label>
+                <div class="range-wrapper">
+                    <input type="range" id="color-count" name="color-count" value="5" min="3" max="8">
+                    <span id="color-count-value">5</span>
+                </div>
+            </div>
+
+            <button id="generate-btn">✨ Generar Paleta</button>
+        </section>
+
+        <section id="palette-display" class="palette-container"></section>
+
+        <section id="preview-section" class="preview-container">
+            <h2>Previsualización en Vivo</h2>
+            <div class="preview-card">
+                <div class="preview-image"></div>
+                <div class="preview-content">
+                    <h3 class="preview-title">Artículo Destacado</h3>
+                    <p class="preview-text">Esta es una descripción del producto. El color del texto y el fondo se adaptarán a tu paleta.</p>
+                    <button class="preview-button">Comprar Ahora</button>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 - Creado con Wiener Hound Studios.</p>
+    </footer>
+
+    <!-- ================== JAVASCRIPT COMBINADO ================== -->
+    <script>
+    // --- SCRIPT.JS (LÓGICA DE LA PALETA) ---
+
+    const palettePurposeSelect = document.getElementById('palette-purpose');
+    const baseColorInput = document.getElementById('base-color');
+    const colorCountSlider = document.getElementById('color-count');
+    const colorCountValue = document.getElementById('color-count-value');
+    const generateBtn = document.getElementById('generate-btn');
+    const paletteDisplay = document.getElementById('palette-display');
+    const harmonyInfoIcon = document.getElementById('harmony-info-icon');
+    const harmonyInfoBox = document.getElementById('harmony-info-box');
+    const harmonyInfoText = document.getElementById('harmony-info-text');
+
+    const harmonyDescriptions = {
+        'monochromatic': 'Usa un solo color con variaciones en brillo y saturación. Ideal para un look limpio, elegante y minimalista.', 'analogous': 'Combina colores que están uno al lado del otro en el círculo cromático. Crea una sensación de calma y armonía natural.', 'complementary': 'Usa colores opuestos en el círculo cromático para un máximo contraste. Perfecto para llamadas a la acción y diseños vibrantes.', 'split-complementary': 'Ofrece un alto contraste como la complementaria, pero con menos tensión visual. Una opción muy versátil y agradable.', 'triadic': 'Usa tres colores equidistantes, creando una paleta equilibrada pero dinámica. Ideal para diseños coloridos y enérgicos.', 'tetradic': 'Utiliza cuatro colores en dos pares complementarios. Ofrece la mayor variedad y es excelente para diseños que necesitan destacar.', 'earth-tones': 'Genera colores inspirados en la naturaleza como marrones, beiges y verdes apagados. Evoca una sensación orgánica y estable.', 'pastel-tones': 'Crea colores suaves y pálidos. Perfecta para diseños que buscan transmitir delicadeza, calma y un toque juvenil.', 'jewel-tones': 'Produce colores ricos y saturados inspirados en gemas preciosas. Ideal para un look lujoso, dramático y sofisticado.', 'neon-tones': 'Genera colores extremadamente brillantes y vívidos. Usada para un estilo moderno, futurista y lleno de energía.', 'neutral-tones': 'Crea una paleta con blanco, negro y grises. Perfecta para diseños minimalistas y profesionales donde el contenido es el rey.', 'sunset-tones': 'Combina naranjas, rosas y morados cálidos para imitar un atardecer. Evoca sensaciones de calidez, drama y belleza.'
+    };
+
+    colorCountSlider.addEventListener('input', () => { colorCountValue.textContent = colorCountSlider.value; });
+    generateBtn.addEventListener('click', generatePalette);
+    harmonyInfoIcon.addEventListener('mouseenter', () => { harmonyInfoBox.classList.add('visible'); });
+    harmonyInfoIcon.addEventListener('mouseleave', () => { harmonyInfoBox.classList.remove('visible'); });
+
+    palettePurposeSelect.addEventListener('change', (e) => {
+        const selectedHarmony = e.target.value;
+        harmonyInfoText.textContent = harmonyDescriptions[selectedHarmony] || 'Selecciona un estilo para ver una descripción.';
+        const isThematic = e.target.selectedOptions[0].parentElement.label === 'Estilos Temáticos';
+        baseColorInput.disabled = isThematic;
+        if (baseColorInput.parentElement) { baseColorInput.parentElement.style.opacity = isThematic ? 0.5 : 1; }
+        if (isThematic && selectedHarmony) { generatePalette(); }
+    });
+
+    function generatePalette(event) {
+        const harmony = palettePurposeSelect.value;
+        const baseColorHex = baseColorInput.value;
+        const count = parseInt(colorCountSlider.value, 10) || 5;
+        if (!harmony) { if (event && event.type === 'click') { console.warn('Por favor, elige un modo para generar la paleta.'); } return; }
+        let colors = [];
+        const baseHsl = hexToHsl(baseColorHex);
+        switch (harmony) {
+            case 'monochromatic': colors = getMonochromatic(baseHsl, count); break;
+            case 'analogous': colors = getAnalogous(baseHsl, count); break;
+            case 'complementary': colors = getComplementary(baseHsl, count); break;
+            case 'split-complementary': colors = getSplitComplementary(baseHsl, count); break;
+            case 'triadic': colors = getTriadic(baseHsl, count); break;
+            case 'tetradic': colors = getTetradic(baseHsl, count); break;
+            case 'earth-tones': colors = getThematicPalette(count, [[20, 45], [20, 60], [10, 50]]); break;
+            case 'pastel-tones': colors = getThematicPalette(count, [[0, 360], [25, 60], [85, 95]]); break;
+            case 'jewel-tones': colors = getThematicPalette(count, [[180, 330], [60, 100], [20, 40]]); break;
+            case 'neon-tones': colors = getThematicPalette(count, [[280, 360], [90, 100], [50, 60]]); break;
+            case 'neutral-tones': colors = getThematicPalette(count, [[0, 360], [0, 5], [20, 90]]); break;
+            case 'sunset-tones': colors = getThematicPalette(count, [[340, 30], [80, 100], [50, 75]]); break;
+            default: colors = getThematicPalette(count, [[0, 360], [40, 80], [30, 70]]);
+        }
+        const hexColors = colors.map(hslToHex);
+        renderPalette(hexColors);
+    }
+    
+    function getMonochromatic(baseHsl, count) { const colors = []; for (let i = 0; i < count; i++) { const step = (i - Math.floor(count / 2)) * 12; let newLightness = clamp(baseHsl.l + step, 6, 94); colors.push({ h: baseHsl.h, s: baseHsl.s, l: newLightness }); } return colors; }
+    function getAnalogous(baseHsl, count) { const colors = []; const step = 30; for (let i = 0; i < count; i++) { let newHue = (baseHsl.h + (i - Math.floor(count / 2)) * step + 360) % 360; colors.push({ h: newHue, s: baseHsl.s, l: baseHsl.l }); } return colors; }
+    function getComplementary(baseHsl, count) { const colors = [{...baseHsl}]; const complementHue = (baseHsl.h + 180) % 360; colors.push({h: complementHue, s: baseHsl.s, l: baseHsl.l}); for (let i = 2; i < count; i++) { const colorToVary = i % 2 === 0 ? baseHsl : colors[1]; colors.push({h: colorToVary.h, s: colorToVary.s, l: clamp((colorToVary.l + (i * 8)), 6, 94)}); } return colors.slice(0, count); }
+    function getSplitComplementary(baseHsl, count) { const colors = [{...baseHsl}]; const complementHue1 = (baseHsl.h + 150) % 360; const complementHue2 = (baseHsl.h + 210) % 360; colors.push({h: complementHue1, s: baseHsl.s, l: baseHsl.l}); colors.push({h: complementHue2, s: baseHsl.s, l: baseHsl.l}); for (let i = 3; i < count; i++) { colors.push({h: baseHsl.h, s: baseHsl.s, l: clamp((baseHsl.l + i * 6), 6, 94)}); } return colors.slice(0, count); }
+    function getTriadic(baseHsl, count) { const colors = [{...baseHsl}]; colors.push({h: (baseHsl.h + 120) % 360, s: baseHsl.s, l: baseHsl.l}); colors.push({h: (baseHsl.h + 240) % 360, s: baseHsl.s, l: baseHsl.l}); for (let i = 3; i < count; i++) { colors.push({h: colors[i % 3].h, s: baseHsl.s, l: clamp((baseHsl.l + i * 4), 6, 94)}); } return colors.slice(0, count); }
+    function getTetradic(baseHsl, count) { const colors = [{...baseHsl}]; colors.push({h: (baseHsl.h + 90) % 360, s: baseHsl.s, l: baseHsl.l}); colors.push({h: (baseHsl.h + 180) % 360, s: baseHsl.s, l: baseHsl.l}); colors.push({h: (baseHsl.h + 270) % 360, s: baseHsl.s, l: baseHsl.l}); return colors.slice(0, Math.min(count, 4)); }
+    function getThematicPalette(count, [hRange, sRange, lRange]) { const colors = []; for (let i = 0; i < count; i++) { const h = randomHueInRange(hRange[0], hRange[1]); const s = Math.random() * (sRange[1] - sRange[0]) + sRange[0]; const l = Math.random() * (lRange[1] - lRange[0]) + lRange[0]; colors.push({ h, s, l }); } return colors; }
+    function renderPalette(colors) { paletteDisplay.innerHTML = ''; if (colors.length === 0) { paletteDisplay.innerHTML = `<div class="palette-placeholder"><p>¡Tu paleta de colores aparecerá aquí!</p></div>`; } else { colors.forEach(colorHex => { const colorSwatch = document.createElement('div'); colorSwatch.className = 'color-swatch'; colorSwatch.style.backgroundColor = colorHex; const colorCode = document.createElement('span'); colorCode.className = 'color-code'; colorCode.textContent = colorHex.toUpperCase(); colorSwatch.appendChild(colorCode); colorSwatch.addEventListener('click', () => { navigator.clipboard.writeText(colorHex).then(() => { const previous = colorCode.textContent; colorCode.textContent = '¡Copiado!'; setTimeout(() => { colorCode.textContent = previous; }, 1000); }).catch(err => { console.error('Error al copiar:', err); }); }); paletteDisplay.appendChild(colorSwatch); }); } const preview = document.getElementById('preview-section'); if (preview) { const safe = (i) => colors[i] || colors[colors.length - 1] || '#ffffff'; preview.style.setProperty('--p-card-bg', safe(4)); preview.style.setProperty('--p-text', safe(0)); preview.style.setProperty('--p-headline', safe(1)); preview.style.setProperty('--p-primary', safe(2)); preview.style.setProperty('--p-accent', safe(3)); preview.style.setProperty('--p-border', safe(3)); } }
+    function hexToHsl(hex) { if (!hex || typeof hex !== 'string') return { h: 0, s: 0, l: 50 }; hex = hex.replace('#', ''); let r, g, b; if (hex.length === 3) { r = parseInt(hex[0] + hex[0], 16); g = parseInt(hex[1] + hex[1], 16); b = parseInt(hex[2] + hex[2], 16); } else { r = parseInt(hex.substring(0, 2), 16); g = parseInt(hex.substring(2, 4), 16); b = parseInt(hex.substring(4, 6), 16); } r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); let h = 0, s = 0, l = (max + min) / 2; if (max !== min) { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s * 100, l: l * 100 }; }
+    function hslToHex({ h = 0, s = 0, l = 0 }) { s /= 100; l /= 100; const c = (1 - Math.abs(2 * l - 1)) * s; const x = c * (1 - Math.abs((h / 60) % 2 - 1)); const m = l - c / 2; let r = 0, g = 0, b = 0; if (h >= 0 && h < 60) { [r, g, b] = [c, x, 0]; } else if (h >= 60 && h < 120) { [r, g, b] = [x, c, 0]; } else if (h >= 120 && h < 180) { [r, g, b] = [0, c, x]; } else if (h >= 180 && h < 240) { [r, g, b] = [0, x, c]; } else if (h >= 240 && h < 300) { [r, g, b] = [x, 0, c]; } else { [r, g, b] = [c, 0, x]; } const toHex = val => Math.round(val * 255).toString(16).padStart(2, '0'); return `#${toHex(r+m)}${toHex(g+m)}${toHex(b+m)}`; }
+    function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
+    function randomHueInRange(a, b) { a = ((a % 360) + 360) % 360; b = ((b % 360) + 360) % 360; if (a === b) return a; if (a < b) { return Math.random() * (b - a) + a; } else { const total = (360 - a) + b; const r = Math.random() * total; return (r < (360 - a)) ? (a + r) : (r - (360 - a)); } }
+
+
+    // --- ANIMATIONS.JS (LÓGICA DE LAS COLUMNAS) ---
+    function createDnaAnimation(elementId) {
+        const dnaElement = document.getElementById(elementId);
+        if (!dnaElement) return;
+
+        const height = 50;
+        const width = 17; // ✨ ¡Ajustado para el grosor!
+        const speed = 0.05;
+        let angle = Math.random() * Math.PI * 2;
+
+        function drawFrame() {
+            const screen = Array(height).fill(null).map(() => Array(width).fill(' '));
+            for (let i = 0; i < height; i++) {
+                // ✨ ¡Amplitud aumentada para un efecto más grueso!
+                const x1 = Math.floor(width / 2 + (width / 2.5) * Math.sin(i * 0.4 + angle));
+                const x2 = Math.floor(width / 2 - (width / 2.5) * Math.sin(i * 0.4 + angle));
+                
+                if (x1 >= 0 && x1 < width) screen[i][x1] = '█'; // Caracter más grueso
+                if (x2 >= 0 && x2 < width) screen[i][x2] = '█'; // Caracter más grueso
+
+                const bridgeChar = getBridgeChar(i, x1, x2);
+                for (let j = Math.min(x1, x2) + 1; j < Math.max(x1, x2); j++) {
+                    screen[i][j] = bridgeChar;
+                }
+            }
+            dnaElement.textContent = screen.map(row => row.join('')).join('\n');
+            angle += speed;
+        }
+
+        function getBridgeChar(i, x1, x2) {
+            const distance = Math.abs(x1 - x2);
+            if (distance < 3) return ''; // No dibuja puentes si las hebras están muy juntas
+            const pattern = (i + Math.floor(angle * 2)) % 12;
+            if (pattern < 4) return '═';
+            if (pattern < 8) return '─';
+            return '═';
+        }
+
+        setInterval(drawFrame, 80);
+    }
+
+    // --- INICIADOR DE AMBOS SCRIPTS ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Iniciar las animaciones de las columnas
+        createDnaAnimation('dna-animation-left');
+        createDnaAnimation('dna-animation-right');
+
+        // Generar una paleta inicial si ya hay un modo seleccionado
+        if (palettePurposeSelect.value) {
+            generatePalette();
+        } else {
+            // Si no hay nada seleccionado, mostramos el placeholder
+            renderPalette([]);
+        }
+    });
+
+    </script>
+</body>
+</html>
