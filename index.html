@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
+    <!-- AÑADIDO: Conexión con el manifest para la PWA -->
+    <link rel="manifest" href="manifest.json">
+    
     <style>
         /* --- Variables y Estilos Globales --- */
         :root {
@@ -66,7 +69,6 @@
         .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
         label { font-size: 0.9rem; font-weight: 700; color: var(--color-text-secondary); }
 
-        /* --- CORRECCIÓN: Asignación de áreas del grid --- */
         .controls-container h2 { grid-area: title; margin-bottom: 0.5rem; border-bottom: 1px solid #444; padding-bottom: 0.5rem; }
         #palette-mode-group { grid-area: mode; }
         #color-group { grid-area: color; }
@@ -107,45 +109,17 @@
         .color-swatch:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
         .color-code { width: 100%; padding: 0.75rem; background-color: rgba(0, 0, 0, 0.45); color: white; text-align: center; font-weight: 700; }
 
-        /* ================================================================== */
-        /* --- AÑADIDO: ESTILOS PARA MÓVILES Y PANTALLAS PEQUEÑAS --- */
-        /* ================================================================== */
         @media (max-width: 768px) {
-            /* 1. Ajustamos el layout principal y la tipografía */
-            .main-header h1 {
-                font-size: 2rem; /* Hacemos el título principal un poco más pequeño */
-            }
-
-            main, .main-header, .main-footer {
-                width: 95%; /* Usamos un poco más de espacio en los lados */
-            }
-
-            /* 2. Reorganizamos el panel de controles a UNA SOLA COLUMNA */
+            .main-header h1 { font-size: 2rem; }
+            main, .main-header, .main-footer { width: 95%; }
             .controls-container {
-                /* Cambiamos el "mapa" del grid para que sea vertical */
-                grid-template-columns: 1fr; /* Ahora solo hay una columna */
-                grid-template-areas:
-                    "title"
-                    "mode"
-                    "color"
-                    "count"
-                    "button";
-                padding: 1.5rem; /* Reducimos un poco el padding */
+                grid-template-columns: 1fr;
+                grid-template-areas: "title" "mode" "color" "count" "button";
+                padding: 1.5rem;
             }
-
-            #generate-btn {
-                margin-top: 1rem;
-            }
-
-            /* 3. Hacemos que la previsualización se vea bien */
-            .preview-container {
-                width: 95%;
-                margin-top: 2rem;
-            }
-
-            .preview-card {
-                max-width: 100%;
-            }
+            #generate-btn { margin-top: 1rem; }
+            .preview-container { width: 95%; margin-top: 2rem; }
+            .preview-card { max-width: 100%; }
         }
     </style>
 </head>
@@ -330,7 +304,6 @@
     function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
     function randomHueInRange(a, b) { a = ((a % 360) + 360) % 360; b = ((b % 360) + 360) % 360; if (a === b) return a; if (a < b) { return Math.random() * (b - a) + a; } else { const total = (360 - a) + b; const r = Math.random() * total; return (r < (360 - a)) ? (a + r) : (r - (360 - a)); } }
 
-
     // --- ANIMATIONS.JS (LÓGICA DE LAS COLUMNAS) ---
     function createDnaAnimation(elementId) {
         const dnaElement = document.getElementById(elementId);
@@ -369,6 +342,19 @@
             generatePalette();
         } else {
             renderPalette([]);
+        }
+
+        // --- AÑADIDO: Lógica para registrar el Service Worker ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado con éxito:', registration);
+                    })
+                    .catch(err => {
+                        console.log('Fallo en el registro del Service Worker:', err);
+                    });
+            });
         }
     });
     </script>
