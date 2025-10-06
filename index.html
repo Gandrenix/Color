@@ -335,58 +335,42 @@
     function createDnaAnimation(elementId) {
         const dnaElement = document.getElementById(elementId);
         if (!dnaElement) return;
-
-        const height = 50;
-        const width = 17; // ✨ ¡Ajustado para el grosor!
-        const speed = 0.05;
+        const height = 50, width = 17, speed = 0.05;
         let angle = Math.random() * Math.PI * 2;
-
         function drawFrame() {
             const screen = Array(height).fill(null).map(() => Array(width).fill(' '));
             for (let i = 0; i < height; i++) {
-                // ✨ ¡Amplitud aumentada para un efecto más grueso!
                 const x1 = Math.floor(width / 2 + (width / 2.5) * Math.sin(i * 0.4 + angle));
                 const x2 = Math.floor(width / 2 - (width / 2.5) * Math.sin(i * 0.4 + angle));
-                
-                if (x1 >= 0 && x1 < width) screen[i][x1] = '█'; // Caracter más grueso
-                if (x2 >= 0 && x2 < width) screen[i][x2] = '█'; // Caracter más grueso
-
+                if (x1 >= 0 && x1 < width) screen[i][x1] = '█';
+                if (x2 >= 0 && x2 < width) screen[i][x2] = '█';
                 const bridgeChar = getBridgeChar(i, x1, x2);
-                for (let j = Math.min(x1, x2) + 1; j < Math.max(x1, x2); j++) {
-                    screen[i][j] = bridgeChar;
-                }
+                for (let j = Math.min(x1, x2) + 1; j < Math.max(x1, x2); j++) { screen[i][j] = bridgeChar; }
             }
             dnaElement.textContent = screen.map(row => row.join('')).join('\n');
             angle += speed;
         }
-
         function getBridgeChar(i, x1, x2) {
             const distance = Math.abs(x1 - x2);
-            if (distance < 3) return ''; // No dibuja puentes si las hebras están muy juntas
+            if (distance < 3) return '';
             const pattern = (i + Math.floor(angle * 2)) % 12;
             if (pattern < 4) return '═';
             if (pattern < 8) return '─';
             return '═';
         }
-
         setInterval(drawFrame, 80);
     }
 
     // --- INICIADOR DE AMBOS SCRIPTS ---
     document.addEventListener('DOMContentLoaded', () => {
-        // Iniciar las animaciones de las columnas
         createDnaAnimation('dna-animation-left');
         createDnaAnimation('dna-animation-right');
-
-        // Generar una paleta inicial si ya hay un modo seleccionado
         if (palettePurposeSelect.value) {
             generatePalette();
         } else {
-            // Si no hay nada seleccionado, mostramos el placeholder
             renderPalette([]);
         }
     });
-
     </script>
 </body>
 </html>
